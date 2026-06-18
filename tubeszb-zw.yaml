@@ -5,5 +5,9 @@ substitutions:
   device_description: TubesZB Z-Wave Coordinator
   api_key: !secret zwave_coordinator_api_key
 
+api:
+  encryption:
+    key: ${api_key}
+
 packages:
   tubezb: github://tube0013/tube_gateways/models/current/tubeszb-zw-kit/tubeszb-zw.yaml
