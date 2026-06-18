@@ -7,6 +7,7 @@ time:
     id: time_sntp
     timezone: "${time_timezone}"
     servers:
-      - time1.greyrock.io
-      - time2.greyrock.io
-      - time3.greyrock.io
+      - time1.internal.greyrock.io
+      - time2.internal.greyrock.io
+      - time3.internal.greyrock.io
+      - time4.internal.greyrock.io

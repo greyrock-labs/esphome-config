@@ -7,6 +7,10 @@ wifi:
   id: wifi_id
   domain: !secret domain_devices
   fast_connect: true
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_pwd
+      priority: 0.0
 
 sensor:
   - platform: wifi_signal # Reports the WiFi signal strength in dB
