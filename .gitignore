@@ -1,11 +1,5 @@
-# ESPHome build artifacts
- .esphome/
-**/__pycache__/
-*.pyc
+.esphome/
+.cache/
 
-# Secrets — never commit
-secrets.yaml
-secrets.yml
-
-# Local overrides
-*.local.yaml
+#ESPHome ignores
+/secrets.yaml
