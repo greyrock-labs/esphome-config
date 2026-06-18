@@ -95,15 +95,6 @@ sensor:
     name: "Internal Temp"
     entity_category: diagnostic
 
-  - platform: uptime
-    name: "Uptime"
-    unit_of_measurement: "h"
-    accuracy_decimals: 2
-    update_interval: 60s
-    filters:
-      - lambda: return x / 3600.0;
-    entity_category: diagnostic
-
   - platform: template
     name: "Wi-Fi Disconnects (since boot)"
     id: wifi_disconnects_since_boot_sensor

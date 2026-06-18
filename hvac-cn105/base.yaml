@@ -83,13 +83,6 @@ sensor:
             args: [ 'x' ]
         - lambda: 'id(hp).set_remote_temperature(x);'
 
-  - platform: uptime
-    name: Uptime
-
-  - platform: wifi_signal
-    name: WiFi Signal
-    update_interval: 120s
-
 climate:
   - platform: cn105
     id: hp
