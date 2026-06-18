@@ -1,0 +1,352 @@
+esphome:
+  name: dining-room-reterminal-e1001
+  friendly_name: Dining Room - Weather Display
+  on_boot:
+    priority: 600
+    then:
+      - output.turn_on: bsp_battery_enable
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: UART0
+
+api:
+  encryption:
+    key: !secret guest_wifi_display_api_key
+
+ota:
+  - platform: esphome
+    password: !secret guest_wifi_display_ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: !secret domain_devices
+  ap:
+    ssid: "guest-wifi-display"
+    password: !secret wifi_captive
+
+captive_portal:
+
+output:
+  - platform: gpio
+    pin: GPIO21
+    id: bsp_battery_enable
+
+spi:
+  clk_pin: GPIO7
+  mosi_pin: GPIO9
+
+font:
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: label_font
+    size: 18
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: value_font
+    size: 24
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: header_font
+    size: 22
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: column_font
+    size: 20
+
+# Time from HA (no NTP drift)
+time:
+  - platform: homeassistant
+    id: ha_time
+
+# ── Davis weather data — all from HA, no Prom, no http_request ──
+sensor:
+  # Outdoor / current
+  - platform: homeassistant
+    id: out_temp
+    entity_id: sensor.grey_rock_outside_temperature
+  - platform: homeassistant
+    id: out_humidity
+    entity_id: sensor.grey_rock_outside_humidity
+  - platform: homeassistant
+    id: dewpoint
+    entity_id: sensor.grey_rock_dewpoint
+  - platform: homeassistant
+    id: pressure
+    entity_id: sensor.grey_rock_pressure
+  - platform: homeassistant
+    id: wind
+    entity_id: sensor.grey_rock_wind
+  - platform: homeassistant
+    id: wind_gust
+    entity_id: sensor.grey_rock_wind_gust
+  - platform: homeassistant
+    id: uv_index
+    entity_id: sensor.grey_rock_uv_index
+  - platform: homeassistant
+    id: solar_irr
+    entity_id: sensor.grey_rock_solar_irradiance
+
+  # Rain
+  - platform: homeassistant
+    id: rain_today
+    entity_id: sensor.grey_rock_rain_today
+  - platform: homeassistant
+    id: rain_month
+    entity_id: sensor.grey_rock_rain_this_month
+  - platform: homeassistant
+    id: rain_year
+    entity_id: sensor.grey_rock_rain_this_year
+  - platform: homeassistant
+    id: rain_storm
+    entity_id: sensor.grey_rock_rain_storm
+  - platform: homeassistant
+    id: rain_intensity
+    entity_id: sensor.grey_rock_rain_intensity
+
+  # Per-room temperatures (BTHome / FSR BT sensors + Aqara occupancy sensors)
+  - platform: homeassistant
+    id: rm_kitchen
+    entity_id: sensor.kitchen_temp_775f_temperature
+  - platform: homeassistant
+    id: rm_mbr
+    entity_id: sensor.mbr_temp_46f8_temperature
+  - platform: homeassistant
+    id: rm_dining
+    entity_id: sensor.dining_room_occupancy_sensor_temperature
+  - platform: homeassistant
+    id: rm_office
+    entity_id: sensor.office_temp_289d_temperature
+  - platform: homeassistant
+    id: rm_dsbath
+    entity_id: sensor.downstairs_bathroom_occupancy_sensor_temperature
+  - platform: homeassistant
+    id: rm_game
+    entity_id: sensor.game_room_occupancy_sensor_temperature
+  - platform: homeassistant
+    id: rm_living
+    entity_id: sensor.fsr_temp_6bd0_temperature
+  - platform: homeassistant
+    id: rm_breezeway
+    entity_id: sensor.breezeway_motion_sensor_temperature
+
+  # Station health
+  - platform: homeassistant
+    id: batt
+    entity_id: sensor.grey_rock_transmitter_battery
+  - platform: homeassistant
+    id: supercap
+    entity_id: sensor.grey_rock_supercapacitor
+  - platform: homeassistant
+    id: solar_panel_v
+    entity_id: sensor.grey_rock_solar_panel
+
+text_sensor:
+  # Forecast summary string from met.no
+  - platform: homeassistant
+    id: forecast_state
+    entity_id: weather.forecast_grey_rock
+
+  # Wind direction (string like "ese")
+  - platform: homeassistant
+    id: wind_dir
+    entity_id: sensor.grey_rock_wind_direction
+
+  # Pressure trend
+  - platform: homeassistant
+    id: pressure_trend
+    entity_id: sensor.grey_rock_pressure_trend
+
+  # Davis last update timestamp
+  - platform: homeassistant
+    id: davis_updated
+    entity_id: sensor.grey_rock_last_updated
+
+  # Davis connectivity
+  - platform: homeassistant
+    id: davis_connected
+    entity_id: binary_sensor.grey_rock_connectivity
+
+button:
+  - platform: template
+    name: "ePaper Full Refresh"
+    on_press:
+      - component.update: epaper_display
+      - delay: 100ms
+      - lambda: 'id(epaper_display).update();'
+
+interval:
+  - interval: 300s  # partial refresh every 5 min — gentle on e-ink
+    then:
+      - lambda: 'id(epaper_display).update();'
+  - interval: 1800s  # full refresh every 30 min — clears partial ghosting
+    then:
+      - component.update: epaper_display
+      - delay: 100ms
+      - lambda: 'id(epaper_display).update();'
+
+display:
+  - platform: waveshare_epaper
+    id: epaper_display
+    model: 7.50inv2alt
+    cs_pin: GPIO10
+    dc_pin: GPIO11
+    reset_pin:
+      number: GPIO12
+      inverted: false
+    busy_pin:
+      number: GPIO13
+      inverted: true
+    update_interval: never
+    lambda: |-
+      int w = it.get_width();   // 800
+      int h = it.get_height();  // 480
+
+      // ── Helpers (stringification) ──
+      auto f_or_q = [](float v, const char* fmt) -> std::string {
+        if (isnan(v)) return "?";
+        char b[16];
+        snprintf(b, sizeof(b), fmt, v);
+        return std::string(b);
+      };
+      auto integer_or_q = [](float v) -> std::string {
+        if (isnan(v)) return "?";
+        char b[8];
+        snprintf(b, sizeof(b), "%.0f", v);
+        return std::string(b);
+      };
+
+      // Map HA weather state to readable label
+      std::string wx_label = "?";
+      if (id(forecast_state).has_state()) {
+        std::string s = id(forecast_state).state;
+        if      (s == "partlycloudy")        wx_label = "partly cloudy";
+        else if (s == "sunny")               wx_label = "sunny";
+        else if (s == "clear-night")         wx_label = "clear";
+        else if (s == "cloudy")              wx_label = "cloudy";
+        else if (s == "rainy")               wx_label = "rain";
+        else if (s == "pouring")             wx_label = "heavy rain";
+        else if (s == "snowy")               wx_label = "snow";
+        else if (s == "windy")               wx_label = "windy";
+        else if (s == "fog")                 wx_label = "fog";
+        else if (s == "hail")                wx_label = "hail";
+        else if (s.rfind("lightning", 0) == 0) wx_label = "storm";
+        else                                 wx_label = s;
+      }
+
+      // ── Header (y 0..50) — time centered (manually, to avoid lambda type issues) ──
+      // Format "Wed Jun 17 02:52 PM" is ~21 chars at size 22 ≈ 252px wide.
+      // Centered start: x = (800 - 252) / 2 = 274.
+      it.strftime(274, 8, id(header_font), COLOR_ON, "%a %b %d %I:%M %p", id(ha_time).now());
+      it.line(0, 50, w, 50);
+
+      // ── Forecast strip (y 50..82) ──
+      // "Grey Rock  partly cloudy  wind 2mph ESE  UV 5.5"
+      std::string dir = id(wind_dir).has_state() ? id(wind_dir).state : "?";
+      for (auto &c : dir) c = toupper(c);
+      char hdr[96];
+      snprintf(hdr, sizeof(hdr), "Grey Rock  %s  wind %smph %s  UV %s",
+               wx_label.c_str(),
+               f_or_q(id(wind).state, "%.0f").c_str(),
+               dir.c_str(),
+               f_or_q(id(uv_index).state, "%.1f").c_str());
+      it.printf(10, 56, id(label_font), COLOR_ON, "%s", hdr);
+      it.line(0, 82, w, 82);
+
+      // ── Column divider (spans Outside/Rain) ──
+      int mid = w / 2;
+      it.line(mid, 90, mid, 270);
+
+      // ── Rooms section: 'Rooms' label centered, then grid + internal divider ──
+      it.printf(mid - 50, 280, id(value_font), COLOR_ON, "Rooms");
+      // Vertical divider inside rooms (between the two columns), spans full grid height
+      it.line(mid, 320, mid, 440);
+
+      // ── LEFT: OUTSIDE (y 90..240) ──
+      int lx = 8;
+      it.printf(lx, 90, id(value_font), COLOR_ON, "Outside");
+      it.printf(lx, 130, id(column_font), COLOR_ON, "%sF  %s%% hum",
+                 f_or_q(id(out_temp).state, "%.0f").c_str(),
+                 integer_or_q(id(out_humidity).state).c_str());
+      it.printf(lx, 165, id(column_font), COLOR_ON, "Dew %sF  UV %s",
+                 f_or_q(id(dewpoint).state, "%.0f").c_str(),
+                 f_or_q(id(uv_index).state, "%.1f").c_str());
+      it.printf(lx, 200, id(column_font), COLOR_ON, "%.2f inHg %s",
+                 isnan(id(pressure).state) ? 0.0f : id(pressure).state,
+                 id(pressure_trend).has_state() ? id(pressure_trend).state.c_str() : "?");
+      it.printf(lx, 235, id(label_font), COLOR_ON, "Solar %s W/m2",
+                 integer_or_q(id(solar_irr).state).c_str());
+
+      // ── RIGHT: RAIN (y 90..240) ──
+      int rx = mid + 8;
+      it.printf(rx, 90, id(value_font), COLOR_ON, "Rain");
+      it.printf(rx, 130, id(column_font), COLOR_ON, "today   %.2f\"",
+                 isnan(id(rain_today).state) ? 0.0f : id(rain_today).state);
+      it.printf(rx, 165, id(column_font), COLOR_ON, "month  %.2f\"",
+                 isnan(id(rain_month).state) ? 0.0f : id(rain_month).state);
+      it.printf(rx, 200, id(column_font), COLOR_ON, "year   %.2f\"",
+                 isnan(id(rain_year).state) ? 0.0f : id(rain_year).state);
+      it.printf(rx, 235, id(label_font), COLOR_ON, "storm  %.2f\"  rate %.1f",
+                 isnan(id(rain_storm).state) ? 0.0f : id(rain_storm).state,
+                 isnan(id(rain_intensity).state) ? 0.0f : id(rain_intensity).state);
+
+      // ── Mid divider ──
+      it.line(0, 270, w, 270);
+
+      // ── Per-room temperatures, 4 rows x 2 cols (y 280..440) ──
+      // Each row uses TWO printfs: label at left edge of cell, value at a
+      // FIXED x position. This guarantees vertical alignment of values
+      // regardless of label length (proportional font widths are unreliable
+      // for column-based layout).
+      // Left col:  label x=8,   value x=250 (14px past longest label "Downstairs Bathroom")
+      // Right col: label x=410, value x=590 (12px past longest label "Master Bedroom")
+      // The longest label in each column has the same ~12-14px gap to its value,
+      // which makes the columns visually consistent.
+      const int lx_lbl = 8;
+      const int rx_lbl = 410;
+      const int lx_val = 250;
+      const int rx_val = 590;
+      // Row 1: Kitchen | Master Bedroom
+      it.printf(lx_lbl, 320, id(column_font), COLOR_ON, "%s", "Kitchen");
+      it.printf(lx_val, 320, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_kitchen).state, "%.0f").c_str());
+      it.printf(rx_lbl, 320, id(column_font), COLOR_ON, "%s", "Master Bedroom");
+      it.printf(rx_val, 320, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_mbr).state, "%.0f").c_str());
+      // Row 2: Dining Room | Office
+      it.printf(lx_lbl, 350, id(column_font), COLOR_ON, "%s", "Dining Room");
+      it.printf(lx_val, 350, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_dining).state, "%.0f").c_str());
+      it.printf(rx_lbl, 350, id(column_font), COLOR_ON, "%s", "Office");
+      it.printf(rx_val, 350, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_office).state, "%.0f").c_str());
+      // Row 3: Downstairs Bathroom | Game Room
+      it.printf(lx_lbl, 380, id(column_font), COLOR_ON, "%s", "Downstairs Bathroom");
+      it.printf(lx_val, 380, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_dsbath).state, "%.0f").c_str());
+      it.printf(rx_lbl, 380, id(column_font), COLOR_ON, "%s", "Game Room");
+      it.printf(rx_val, 380, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_game).state, "%.0f").c_str());
+      // Row 4: Living Room | Breezeway
+      it.printf(lx_lbl, 410, id(column_font), COLOR_ON, "%s", "Living Room");
+      it.printf(lx_val, 410, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_living).state, "%.0f").c_str());
+      it.printf(rx_lbl, 410, id(column_font), COLOR_ON, "%s", "Breezeway");
+      it.printf(rx_val, 410, id(column_font), COLOR_ON, "%sF",
+                 f_or_q(id(rm_breezeway).state, "%.0f").c_str());
+
+      // ── Bottom strip (y 445..) — Davis station health + last update ──
+      it.line(0, 445, w, 445);
+      std::string conn = (id(davis_connected).state == "on") ? "UP" : "DOWN";
+      std::string age = "?";
+      if (id(davis_updated).has_state() && id(davis_updated).state.length() >= 19) {
+        age = id(davis_updated).state.substr(11, 5) + " UTC";
+      }
+      char bot[96];
+      snprintf(bot, sizeof(bot), "Weatherlink %s  Battery %sV  Capacitor %sV  Updated %s",
+               conn.c_str(),
+               f_or_q(id(batt).state, "%.2f").c_str(),
+               f_or_q(id(supercap).state, "%.2f").c_str(),
+               age.c_str());
+      it.printf(10, 455, id(label_font), COLOR_ON, "%s", bot);

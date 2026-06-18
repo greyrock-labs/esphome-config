@@ -1,0 +1,8 @@
+substitutions:
+  device_name: bt-proxy-master-bedroom
+  friendly_name: BT Proxy - MBR
+  api_key: !secret bt_proxy_master_bedroom_api_key
+  ota_password: !secret bt_proxy_master_bedroom_ota_password
+
+packages:
+  device: !include "common/Seeed xiao ESP32-c3 base.yaml"

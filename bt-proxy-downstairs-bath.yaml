@@ -1,0 +1,8 @@
+substitutions:
+  device_name: bt-proxy-downstairs-bath
+  friendly_name: BT Proxy - DS Bathroom
+  api_key: !secret bt_proxy_downstairs_bath_api_key
+  ota_password: !secret bt_proxy_downstairs_bath_ota_password
+
+packages:
+  device: !include "common/Seeed xiao ESP32-c3 base.yaml"
