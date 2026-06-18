@@ -1,7 +1,7 @@
 ---
 substitutions:
   system_name: tubeszb-efr32-mgm24-2023
-  friendly_name: TubesZB - Zigbee Coordinator (MGM24)
+  friendly_name: TubesZB MGM24 2023
   device_description: TubesZB MGM24 Zigbee Coordinator
   api_key: !secret zigbee_coordinator_api_key
 
