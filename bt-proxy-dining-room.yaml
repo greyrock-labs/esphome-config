@@ -1,8 +1,10 @@
+---
 substitutions:
-  device_name: bt-proxy-dining-room
+  system_name: bt-proxy-dining-room
   friendly_name: BT Proxy - Dining Room
+  device_description: Seeed XIAO ESP32-C3 BLE Proxy
   api_key: !secret bt_proxy_dining_room_api_key
   ota_password: !secret bt_proxy_dining_room_ota_password
 
 packages:
-  device: !include "common/Seeed xiao ESP32-c3 base.yaml"
+  device: !include seeed-xiao-esp32-c3/base.yaml

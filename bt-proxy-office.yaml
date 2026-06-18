@@ -1,8 +1,10 @@
+---
 substitutions:
-  device_name: bt-proxy-office
+  system_name: bt-proxy-office
   friendly_name: BT Proxy - Office
+  device_description: Seeed XIAO ESP32-C3 BLE Proxy
   api_key: !secret bt_proxy_office_api_key
   ota_password: !secret bt_proxy_office_ota_password
 
 packages:
-  device: !include "common/Seeed xiao ESP32-c3 base.yaml"
+  device: !include seeed-xiao-esp32-c3/base.yaml

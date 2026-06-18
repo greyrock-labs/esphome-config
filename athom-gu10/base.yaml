@@ -1,16 +1,11 @@
+---
 globals:
   - id: fast_boot
     type: int
     restore_value: yes
     initial_value: '0'
 
-packages:
-  <<: !include_dir_named ../components/common
-  wifi: !include ../components/hardware/wifi.yaml
-
 esphome:
-  name: "${device_name}"
-  friendly_name: "${friendly_name}"
   name_add_mac_suffix: false
   project:
     name: "${project_name}"
@@ -82,7 +77,6 @@ output:
     min_power: 0.000499
     max_power: 1
 
-
 light:
   - platform: rgbww
     id: rgbww_light
@@ -137,3 +131,11 @@ script:
           id(fast_boot) = 0;
           fast_boot->loop();
           global_preferences->sync();
+
+packages:
+  esphome-base: !include
+    file: ../esphome-common/base.yaml
+  wifi: !include
+    file: ../esphome-common/wifi.yaml
+  auto-restart: !include
+    file: ../esphome-common/auto-restart.yaml

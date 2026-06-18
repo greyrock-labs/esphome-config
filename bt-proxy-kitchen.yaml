@@ -1,8 +1,10 @@
+---
 substitutions:
-  device_name: bt-proxy-kitchen
+  system_name: bt-proxy-kitchen
   friendly_name: BT Proxy - Kitchen
+  device_description: Seeed XIAO ESP32-C3 BLE Proxy
   api_key: !secret bt_proxy_kitchen_api_key
   ota_password: !secret bt_proxy_kitchen_ota_password
 
 packages:
-  device: !include "common/Seeed xiao ESP32-c3 base.yaml"
+  device: !include seeed-xiao-esp32-c3/base.yaml

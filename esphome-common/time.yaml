@@ -1,0 +1,12 @@
+---
+substitutions:
+  time_timezone: "America/New_York"
+
+time:
+  - platform: sntp
+    id: time_sntp
+    timezone: "${time_timezone}"
+    servers:
+      - time1.greyrock.io
+      - time2.greyrock.io
+      - time3.greyrock.io

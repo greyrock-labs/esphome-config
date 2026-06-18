@@ -1,10 +1,9 @@
+---
 substitutions:
-  name: tubeszb-zw
+  system_name: tubeszb-zw
+  friendly_name: TubesZB - Z-Wave Coordinator
+  device_description: TubesZB Z-Wave Coordinator
+  api_key: !secret zwave_coordinator_api_key
+
 packages:
-  tubezb.zw: github://tube0013/tube_gateways/models/current/tubeszb-zw-kit/tubeszb-zw.yaml
-esphome:
-  name: ${name}
-  name_add_mac_suffix: false
-api:
-  encryption:
-    key: !secret zwave_coordinator_api_key
+  tubezb: github://tube0013/tube_gateways/models/current/tubeszb-zw-kit/tubeszb-zw.yaml
