@@ -10,4 +10,4 @@ api:
     key: ${api_key}
 
 packages:
-  tubezb: github://tube0013/tube_gateways/models/current/tubeszb-efr32-MGM24/firmware/ESPHome/tubeszb-mgm24.yaml
+  tubezb: github://tube0013/TubesZB-ESPHome-Builder/manifests/tubeszb-efr32-mgm24-2023.yaml@main
