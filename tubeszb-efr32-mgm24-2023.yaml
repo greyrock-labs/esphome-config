@@ -14,5 +14,27 @@ esphome:
   friendly_name: ${friendly_name}
   name_add_mac_suffix: false
 
+select:
+  - id: change_baud_rate
+    name: "Baud Rate"
+    platform: template
+    options:
+      - "115200"
+      - "230400"
+      - "460800"
+      - "921600"
+    initial_option: "115200"
+    optimistic: true
+    restore_value: true
+    internal: false
+    entity_category: config
+    icon: mdi:swap-horizontal
+    set_action:
+      - script.execute:
+          id: apply_uart_baud
+          baud_str: !lambda 'return x;'
+
+sensor: []
+
 packages:
   tubezb: github://tube0013/TubesZB-ESPHome-Builder/manifests/tubeszb-efr32-mgm24-2023.yaml@main
