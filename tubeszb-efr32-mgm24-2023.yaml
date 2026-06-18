@@ -9,5 +9,10 @@ api:
   encryption:
     key: ${api_key}
 
+esphome:
+  name: ${system_name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: false
+
 packages:
   tubezb: github://tube0013/TubesZB-ESPHome-Builder/manifests/tubeszb-efr32-mgm24-2023.yaml@main
