@@ -22,21 +22,6 @@ captive_portal:
 
 mdns:
 
-wifi:
-  <<: !include ../esphome-common/wifi.yaml
-  use_address: ${system_name}.internal.greyrock.io
-  power_save_mode: NONE
-  enable_on_boot: true
-  reboot_timeout: 10min
-  ap:
-    ssid: "${friendly_name} Fallback"
-    password: !secret wifi_captive
-    ap_timeout: 120s
-  on_disconnect:
-    then:
-      - lambda: |-
-          id(_wifi_disconnects_since_boot)++;
-
 esp32_ble_tracker:
   id: ble_tracker
   scan_parameters:
@@ -89,31 +74,16 @@ text_sensor:
       name: "BSSID"
       entity_category: diagnostic
 
-# Basics + Wi-Fi disconnect count (since boot)
 sensor:
   - platform: internal_temperature
     name: "Internal Temp"
     entity_category: diagnostic
 
-  - platform: template
-    name: "Wi-Fi Disconnects (since boot)"
-    id: wifi_disconnects_since_boot_sensor
-    entity_category: diagnostic
-    accuracy_decimals: 0
-    update_interval: 30s
-    lambda: |-
-        return id(_wifi_disconnects_since_boot);
-
-# Globals (since-boot only; not restored)
-globals:
-  - id: _wifi_disconnects_since_boot
-    type: int
-    restore_value: no
-    initial_value: '0'
-
 packages:
   esphome-base: !include
     file: ../esphome-common/base.yaml
+  wifi: !include
+    file: ../esphome-common/wifi.yaml
   bluetooth-proxy: !include
     file: ../esphome-common/bluetooth-proxy.yaml
   auto-restart: !include
