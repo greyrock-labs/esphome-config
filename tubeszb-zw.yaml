@@ -1,6 +1,6 @@
 ---
 substitutions:
-  system_name: tubeszb-2026-zw
+  system_name: tubeszb-zw
   friendly_name: TubesZB - Z-Wave Coordinator
   device_description: TubesZB Z-Wave Coordinator
   api_key: !secret zwave_coordinator_api_key
