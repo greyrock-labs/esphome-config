@@ -1,0 +1,10 @@
+---
+substitutions:
+  system_name: office-weather-display
+  friendly_name: Office - Weather Display
+  device_description: Seeed reTerminal E1001 ePaper Weather Display
+  api_key: !secret office_weather_display_api_key
+  ota_password: !secret office_weather_display_ota_password
+
+packages:
+  device: !include reterminal-e1001/base.yaml
