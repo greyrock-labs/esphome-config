@@ -29,14 +29,7 @@ captive_portal:
 dashboard_import:
   package_import_url: github://athom-tech/athom-configs/athom-rgbww-light.yaml
 
-binary_sensor:
-  - platform: status
-    name: "Status"
-
 sensor:
-  - platform: uptime
-    name: "Uptime Sensor"
-
   - platform: wifi_signal
     name: "WiFi Signal"
     update_interval: 60s
