@@ -1,10 +1,10 @@
 ---
 substitutions:
-  system_name: office-ceiling-4
-  friendly_name: Office Ceiling 4
+  system_name: light-office-ceiling-4
+  friendly_name: Light - Office Ceiling 4
   device_description: Athom GU10 RGBWW Smart Bulb
-  api_key: !secret office_ceiling_4_api_key
-  project_name: "office-ceiling-4"
+  api_key: !secret light_office_ceiling_4_api_key
+  project_name: "light-office-ceiling-4"
   project_version: "1.0.0"
   light_restore_mode: "RESTORE_DEFAULT_ON"
   color_interlock: "true"
