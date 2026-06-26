@@ -4,7 +4,7 @@ substitutions:
   friendly_name: Light - Office Ceiling 3
   device_description: Athom GU10 RGBWW Smart Bulb
   api_key: !secret light_office_ceiling_3_api_key
-  project_name: "light-office-ceiling-3"
+  project_name: "greyrock.light-office-ceiling-3"
   project_version: "1.0.0"
   light_restore_mode: "RESTORE_DEFAULT_ON"
   color_interlock: "true"
