@@ -3,3 +3,5 @@
 
 #ESPHome ignores
 /secrets.yaml
+# ESPHome add-on runtime
+/components/
