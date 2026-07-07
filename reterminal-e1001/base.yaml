@@ -98,16 +98,16 @@ sensor:
     entity_id: sensor.mbr_temp_46f8_temperature
   - platform: homeassistant
     id: rm_dining
-    entity_id: sensor.dining_room_occupancy_sensor_temperature
+    entity_id: sensor.dining_room_dining_room_occupancy_sensor_temperature
   - platform: homeassistant
     id: rm_office
     entity_id: sensor.office_temp_289d_temperature
   - platform: homeassistant
     id: rm_dsbath
-    entity_id: sensor.downstairs_bathroom_occupancy_sensor_temperature
+    entity_id: sensor.downstairs_bathroom_downstairs_bathroom_occupancy_sensor_temperature
   - platform: homeassistant
     id: rm_game
-    entity_id: sensor.game_room_occupancy_sensor_temperature
+    entity_id: sensor.game_room_game_room_occupancy_sensor_temperature
   - platform: homeassistant
     id: rm_living
     entity_id: sensor.fsr_temp_6bd0_temperature
