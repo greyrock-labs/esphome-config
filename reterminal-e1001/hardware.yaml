@@ -1,0 +1,55 @@
+---
+# Hardware-only package for the Seeed reTerminal E1001 ePaper display.
+# Carries: esp32 board, logger, ota, captive_portal, on_boot output,
+# spi bus, fonts, waveshare_epaper display config (no lambda — caller renders).
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: UART0
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+captive_portal:
+
+esphome:
+  on_boot:
+    priority: 600
+    then:
+      - output.turn_on: bsp_battery_enable
+
+output:
+  - platform: gpio
+    pin: GPIO21
+    id: bsp_battery_enable
+
+spi:
+  clk_pin: GPIO7
+  mosi_pin: GPIO9
+
+font:
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: label_font
+    size: 18
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: value_font
+    size: 24
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: header_font
+    size: 22
+  - file: "fonts/OpenSans-Bold.ttf"
+    id: column_font
+    size: 20
+
+packages:
+  esphome-base: !include
+    file: ../esphome-common/base.yaml
+  wifi: !include
+    file: ../esphome-common/wifi.yaml
+  auto-restart: !include
+    file: ../esphome-common/auto-restart.yaml
