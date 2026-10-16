@@ -77,7 +77,7 @@ sensor:
     entity_id: sensor.fsr_temp_6bd0_temperature
   - platform: homeassistant
     id: rm_breezeway
-    entity_id: sensor.breezeway_motion_sensor_temperature
+    entity_id: sensor.breezeway_breezeway_occupancy_sensor_temperature
 
   - platform: homeassistant
     id: batt
