@@ -13,11 +13,6 @@ logger:
   baud_rate: 115200
   hardware_uart: USB_CDC
 
-ota:
-  - platform: esphome
-    password: ${ota_password}
-    version: 2
-
 captive_portal:
 
 mdns:

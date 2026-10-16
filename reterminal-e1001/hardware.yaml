@@ -1,6 +1,6 @@
 ---
 # Hardware-only package for the Seeed reTerminal E1001 ePaper display.
-# Carries: esp32 board, logger, ota, captive_portal, on_boot output,
+# Carries: esp32 board, logger, captive_portal, on_boot output,
 # spi bus, fonts, waveshare_epaper display config (no lambda — caller renders).
 
 esp32:
@@ -10,10 +10,6 @@ esp32:
 
 logger:
   hardware_uart: UART0
-
-ota:
-  - platform: esphome
-    password: ${ota_password}
 
 captive_portal:
 
